@@ -19,7 +19,12 @@ exports.calculate = async ({
     );
 
     if (combinations.rowCount === 0) {
-      combinations = calculateLandCombinations();
+      combinations = calculateLandCombinations(
+        deckSize,
+        achieveChance,
+        sources,
+        onTurn
+      );
 
       db.query(
         `INSERT INTO calculations (deck_size, achieve_chance, sources, on_turn, untapped_by_tapped) VALUES ($1, $2, $3, $4, $5);`,
@@ -31,6 +36,7 @@ exports.calculate = async ({
 
     return combinations.rows[0].untapped_by_tapped;
   } catch (err) {
+    console.log(err);
     throw new ClientFriendlyError('Database Error', 500);
   }
 };
