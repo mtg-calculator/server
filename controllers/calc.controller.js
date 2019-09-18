@@ -1,8 +1,8 @@
-const calculator = require('../models/calc.model');
+const { calculate } = require('../models/calc.model');
 
-exports.getCalculation = (request, response, next) => {
+exports.getCalculation = async ({ query }, response, next) => {
   try {
-    const calculation = calculator.calculate();
+    const calculation = await calculate(query);
     return response.status(200).send(calculation);
   } catch (err) {
     next(err);
