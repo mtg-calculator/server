@@ -12,23 +12,50 @@ exports.calculate = async ({
     throw new ClientFriendlyError('Missing Query Parameters', 400);
   }
 
+  if (
+    deckSize > 100 ||
+    deckSize < 40 ||
+    achieveChance > 85 ||
+    achieveChance < 0 ||
+    sources > onTurn ||
+    sources < 0 ||
+    onTurn > 10 ||
+    onTurn < 1
+  ) {
+    throw new ClientFriendlyError(
+      'Improper Query Parameters:\ndeck_size must be exactly or between 40 and 100\nachieve_chance must be exactly or between 0 and 85\nsources must be less than or equal to on_turn and greater than 0\non_turn must be exactly or between 1 and 10',
+      400
+    );
+  }
+
+  const deckSizeFloor = Math.floor(deckSize);
+  const achieveChanceFloor = Math.floor(achieveChance);
+  const sourcesFloor = Math.floor(sources);
+  const onTurnFloor = Math.floor(onTurn);
+
   try {
     let combinations = await db.query(
       `SELECT * FROM calculations WHERE deck_size = $1 AND achieve_chance = $2 AND sources = $3 AND on_turn = $4`,
-      [deckSize, achieveChance, sources, onTurn]
+      [deckSizeFloor, achieveChanceFloor, sourcesFloor, onTurnFloor]
     );
 
     if (combinations.rowCount === 0) {
       combinations = calculateLandCombinations(
-        deckSize,
-        achieveChance,
-        sources,
-        onTurn
+        deckSizeFloor,
+        achieveChanceFloor,
+        sourcesFloor,
+        onTurnFloor
       );
 
       db.query(
         `INSERT INTO calculations (deck_size, achieve_chance, sources, on_turn, untapped_by_tapped) VALUES ($1, $2, $3, $4, $5);`,
-        [deckSize, achieveChance, sources, onTurn, combinations]
+        [
+          deckSizeFloor,
+          achieveChanceFloor,
+          sourcesFloor,
+          onTurnFloor,
+          combinations
+        ]
       );
 
       return combinations;
