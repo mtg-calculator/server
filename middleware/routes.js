@@ -13,5 +13,6 @@ router.get('/api', (request, response, next) => {
 
 /* calculator routes */
 router.get('/api/calculate', calculator.getCalculation);
+router.post('/api/calculate', calculator.calculateForEachColor);
 
 module.exports = router;

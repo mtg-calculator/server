@@ -9,7 +9,7 @@ exports.calculate = async ({
   on_turn: onTurn
 }) => {
   if (!deckSize || !achieveChance || !sources || !onTurn) {
-    throw new ClientFriendlyError('Missing Query Parameters', 400);
+    throw new ClientFriendlyError('Missing Parameters', 400);
   }
 
   if (
@@ -23,7 +23,7 @@ exports.calculate = async ({
     onTurn < 1
   ) {
     throw new ClientFriendlyError(
-      'Improper Query Parameters:\ndeck_size must be exactly or between 40 and 100\nachieve_chance must be exactly or between 0 and 85\nsources must be less than or equal to on_turn and greater than 0\non_turn must be exactly or between 1 and 10',
+      'Improper Parameters:\ndeck_size must be exactly or between 40 and 100\nachieve_chance must be exactly or between 0 and 85\nsources must be less than or equal to on_turn and greater than 0\non_turn must be exactly or between 1 and 10',
       400
     );
   }
@@ -66,4 +66,36 @@ exports.calculate = async ({
     console.log(err);
     throw new ClientFriendlyError('Database Error', 500);
   }
+};
+
+exports.calculateMultipleColors = async ({
+  blue,
+  black,
+  green,
+  white,
+  red,
+  colorless
+}) => {
+  const result = {};
+
+  if (blue) {
+    result.blue = await exports.calculate(blue);
+  }
+  if (black) {
+    result.black = await exports.calculate(black);
+  }
+  if (green) {
+    result.green = await exports.calculate(green);
+  }
+  if (white) {
+    result.white = await exports.calculate(white);
+  }
+  if (red) {
+    result.red = await exports.calculate(red);
+  }
+  if (colorless) {
+    result.colorless = await exports.calculate(colorless);
+  }
+
+  return result;
 };
